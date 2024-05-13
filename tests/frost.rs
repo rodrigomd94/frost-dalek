@@ -16,7 +16,7 @@ use ed25519_dalek::Verifier;
 use rand::rngs::OsRng;
 
 #[cfg(feature = "std")]
-use frost_dalek::compute_message_hash;
+use frost_dalek::message_to_buffer;
 #[cfg(feature = "std")]
 use frost_dalek::generate_commitment_share_lists;
 
@@ -126,11 +126,11 @@ fn signing_and_verification_3_out_of_5() {
     aggregator.include_signer(4, p4_public_comshares.commitments[0], (&p4_sk).into());
 
     let signers = aggregator.get_signers();
-    let message_hash = compute_message_hash(&context[..], &message[..]);
+    let message_buffer = message_to_buffer(&context[..], &message[..]);
 
-    let p1_partial = p1_sk.sign(&message_hash, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
-    let p3_partial = p3_sk.sign(&message_hash, &group_key, &mut p3_secret_comshares, 0, signers).unwrap();
-    let p4_partial = p4_sk.sign(&message_hash, &group_key, &mut p4_secret_comshares, 0, signers).unwrap();
+    let p1_partial = p1_sk.sign(&message_buffer, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
+    let p3_partial = p3_sk.sign(&message_buffer, &group_key, &mut p3_secret_comshares, 0, signers).unwrap();
+    let p4_partial = p4_sk.sign(&message_buffer, &group_key, &mut p4_secret_comshares, 0, signers).unwrap();
 
     aggregator.include_partial_signature(p1_partial);
     aggregator.include_partial_signature(p3_partial);
@@ -138,7 +138,7 @@ fn signing_and_verification_3_out_of_5() {
 
     let aggregator = aggregator.finalize().unwrap();
     let threshold_signature = aggregator.aggregate().unwrap();
-    let verification_result = threshold_signature.verify(&group_key, &message_hash);
+    let verification_result = threshold_signature.verify(&group_key, &message_buffer);
 
     assert!(verification_result.is_ok());
 }
@@ -202,17 +202,17 @@ fn signing_and_verification_with_ed25519_dalek_2_out_of_3() {
     aggregator.include_signer(3, p3_public_comshares.commitments[0], (&p3_sk).into());
 
     let signers = aggregator.get_signers();
-    let message_hash = compute_message_hash(&context[..], &message[..]);
+    let message_buffer = message_to_buffer(&context[..], &message[..]);
 
-    let p1_partial = p1_sk.sign(&message_hash, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
-    let p3_partial = p3_sk.sign(&message_hash, &group_key, &mut p3_secret_comshares, 0, signers).unwrap();
+    let p1_partial = p1_sk.sign(&message_buffer, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
+    let p3_partial = p3_sk.sign(&message_buffer, &group_key, &mut p3_secret_comshares, 0, signers).unwrap();
 
     aggregator.include_partial_signature(p1_partial);
     aggregator.include_partial_signature(p3_partial);
 
     let aggregator = aggregator.finalize().unwrap();
     let threshold_signature = aggregator.aggregate().unwrap();
-    let verification_result = threshold_signature.verify(&group_key, &message_hash);
+    let verification_result = threshold_signature.verify(&group_key, &message_buffer);
 
     assert!(verification_result.is_ok());
 
@@ -221,5 +221,5 @@ fn signing_and_verification_with_ed25519_dalek_2_out_of_3() {
 
     let public_key_bytes = group_key.to_ed25519();
     let public_key = ed25519_dalek::PublicKey::from_bytes(&public_key_bytes[..]).unwrap();
-    assert!(public_key.verify(&message_hash[..], &signature).is_ok());
+    assert!(public_key.verify(&message_buffer[..], &signature).is_ok());
 }

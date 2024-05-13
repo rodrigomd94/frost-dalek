@@ -388,7 +388,7 @@
 //!
 //! ```rust
 //! # #[cfg(feature = "std")]
-//! use frost_dalek::compute_message_hash;
+//! use frost_dalek::message_to_buffer;
 //! # #[cfg(feature = "std")]
 //! use frost_dalek::generate_commitment_share_lists;
 //! # use frost_dalek::DistributedKeyGeneration;
@@ -450,7 +450,7 @@
 //!
 //! // Every signer should compute a hash of the message to be signed, along with, optionally,
 //! // some additional context, such as public information about the run of the protocol.
-//! let message_hash = compute_message_hash(&context[..], &message[..]);
+//! let message_buffer = message_to_buffer(&context[..], &message[..]);
 //!
 //! let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! # Ok(()) }
@@ -465,7 +465,7 @@
 //!
 //! ```rust
 //! # #[cfg(feature = "std")]
-//! # use frost_dalek::compute_message_hash;
+//! # use frost_dalek::message_to_buffer;
 //! # #[cfg(feature = "std")]
 //! # use frost_dalek::generate_commitment_share_lists;
 //! # use frost_dalek::DistributedKeyGeneration;
@@ -525,7 +525,7 @@
 //! # let context = b"CONTEXT STRING STOLEN FROM DALEK TEST SUITE";
 //! # let message = b"This is a test of the tsunami alert system. This is only a test.";
 //! #
-//! # let message_hash = compute_message_hash(&context[..], &message[..]);
+//! # let message_buffer = message_to_buffer(&context[..], &message[..]);
 //! #
 //! # let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! #
@@ -548,7 +548,7 @@
 //!
 //! ```rust
 //! # #[cfg(feature = "std")]
-//! # use frost_dalek::compute_message_hash;
+//! # use frost_dalek::message_to_buffer;
 //! # #[cfg(feature = "std")]
 //! # use frost_dalek::generate_commitment_share_lists;
 //! # use frost_dalek::DistributedKeyGeneration;
@@ -607,7 +607,7 @@
 //! # let context = b"CONTEXT STRING STOLEN FROM DALEK TEST SUITE";
 //! # let message = b"This is a test of the tsunami alert system. This is only a test.";
 //! #
-//! # let message_hash = compute_message_hash(&context[..], &message[..]);
+//! # let message_buffer = message_to_buffer(&context[..], &message[..]);
 //! #
 //! # let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! #
@@ -616,9 +616,9 @@
 //! #
 //! # let signers = aggregator.get_signers();
 //!
-//! let alice_partial = alice_secret_key.sign(&message_hash, &alice_group_key,
+//! let alice_partial = alice_secret_key.sign(&message_buffer, &alice_group_key,
 //!                                           &mut alice_secret_comshares, 0, signers)?;
-//! let carol_partial = carol_secret_key.sign(&message_hash, &carol_group_key,
+//! let carol_partial = carol_secret_key.sign(&message_buffer, &carol_group_key,
 //!                                           &mut carol_secret_comshares, 0, signers)?;
 //!
 //! aggregator.include_partial_signature(alice_partial);
@@ -660,7 +660,7 @@
 //! in the same way they would for a standard Schnorr signature.
 //!
 //! ```rust,ignore
-//! let verified = threshold_signature.verify(&alice_group_key, &message_hash)?;
+//! let verified = threshold_signature.verify(&alice_group_key, &message_buffer)?;
 //! ```
 //!
 //! # Note on `no_std` usage
@@ -704,6 +704,6 @@ pub use parameters::Parameters;
 pub use precomputation::generate_commitment_share_lists;
 
 #[cfg(feature = "std")]
-pub use signature::compute_message_hash;
+pub use signature::message_to_buffer;
 #[cfg(feature = "std")]
 pub use signature::SignatureAggregator;

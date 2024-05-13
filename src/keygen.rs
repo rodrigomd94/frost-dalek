@@ -792,7 +792,7 @@ mod test {
     use crate::precomputation::generate_commitment_share_lists;
 
     #[cfg(feature = "std")]
-    use crate::signature::calculate_lagrange_coefficients;
+    use crate::signature::{calculate_lagrange_coefficients, message_to_buffer};
     #[cfg(feature = "std")]
     use crate::signature::SignatureAggregator;
 
@@ -889,9 +889,10 @@ mod test {
         aggregator.include_signer(2, p2_public_comshares.commitments[0], (&p2_sk).into());
 
         let signers = aggregator.get_signers();
+        let message_buffer = message_to_buffer( &message[..]);
 
-        let p1_partial = p1_sk.sign(message, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
-        let p2_partial = p2_sk.sign(message, &group_key, &mut p2_secret_comshares, 0, signers).unwrap();
+        let p1_partial = p1_sk.sign(&message_buffer, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
+        let p2_partial = p2_sk.sign(&message_buffer, &group_key, &mut p2_secret_comshares, 0, signers).unwrap();
 
         aggregator.include_partial_signature(p1_partial);
         aggregator.include_partial_signature(p2_partial);
@@ -903,7 +904,7 @@ mod test {
 
         let threshold_signature = signing_result.unwrap();
 
-        let verification_result = threshold_signature.verify(&group_key, message);
+        let verification_result = threshold_signature.verify(&group_key, &message_buffer);
 
         println!("{:?}", verification_result);
 
