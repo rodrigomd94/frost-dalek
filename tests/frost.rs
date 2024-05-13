@@ -119,14 +119,14 @@ fn signing_and_verification_3_out_of_5() {
     let (p3_public_comshares, mut p3_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 3, 1);
     let (p4_public_comshares, mut p4_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 4, 1);
 
-    let mut aggregator = SignatureAggregator::new(params, group_key, context.to_vec(), message.to_vec());
+    let mut aggregator = SignatureAggregator::new(params, group_key,  message.to_vec());
 
     aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
     aggregator.include_signer(3, p3_public_comshares.commitments[0], (&p3_sk).into());
     aggregator.include_signer(4, p4_public_comshares.commitments[0], (&p4_sk).into());
 
     let signers = aggregator.get_signers();
-    let message_buffer = message_to_buffer(&context[..], &message[..]);
+    let message_buffer = message_to_buffer(&message[..]);
 
     let p1_partial = p1_sk.sign(&message_buffer, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
     let p3_partial = p3_sk.sign(&message_buffer, &group_key, &mut p3_secret_comshares, 0, signers).unwrap();
@@ -196,13 +196,13 @@ fn signing_and_verification_with_ed25519_dalek_2_out_of_3() {
     let (p1_public_comshares, mut p1_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 1, 1);
     let (p3_public_comshares, mut p3_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 3, 1);
 
-    let mut aggregator = SignatureAggregator::new(params, group_key, context.to_vec(), message.to_vec());
+    let mut aggregator = SignatureAggregator::new(params, group_key,  message.to_vec());
 
     aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
     aggregator.include_signer(3, p3_public_comshares.commitments[0], (&p3_sk).into());
 
     let signers = aggregator.get_signers();
-    let message_buffer = message_to_buffer(&context[..], &message[..]);
+    let message_buffer = message_to_buffer( &message[..]);
 
     let p1_partial = p1_sk.sign(&message_buffer, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
     let p3_partial = p3_sk.sign(&message_buffer, &group_key, &mut p3_secret_comshares, 0, signers).unwrap();
