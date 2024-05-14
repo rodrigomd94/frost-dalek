@@ -24,6 +24,7 @@ sha2 = { version = "0.9" }
 subtle = { version = "2.4", default-features = false }
 zeroize = { version = "1", default-features = false, features = ["zeroize_derive"] }
 napi = "2.16.6"
+js-sys = "0.3.69"
 
 [dev-dependencies]
 criterion = { version = "0.3" }

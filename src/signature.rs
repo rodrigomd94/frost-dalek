@@ -13,7 +13,7 @@
 use std::boxed::Box;
 #[cfg(feature = "alloc")]
 use alloc::boxed::Box;
-use napi::bindgen_prelude::Buffer;
+use napi::bindgen_prelude::Uint8Array;
 
 #[cfg(feature = "std")]
 use std::collections::HashMap;
@@ -206,12 +206,12 @@ pub(crate) struct IndividualPublicKeys(pub(crate) HashMap<[u8; 4], RistrettoPoin
 impl_indexed_hashmap!(Type = IndividualPublicKeys, Item = RistrettoPoint);
 
 /// Compute a Sha-512 hash of a `context_string` and a `message`.
-pub fn message_to_buffer(message: &[u8]) -> Buffer {
-    Buffer::from(message)
+pub fn message_to_buffer(message: &[u8]) -> Uint8Array {
+    Uint8Array::from(message)
 }
 
 fn compute_binding_factors_and_group_commitment(
-    message: &Buffer,
+    message: &Uint8Array,
     signers: &[Signer],
 ) -> (HashMap<u32, Scalar>, SignerRs)
 {
@@ -260,7 +260,7 @@ fn compute_binding_factors_and_group_commitment(
     (binding_factors, Rs)
 }
 
-fn compute_challenge(message: &Buffer, group_key: &GroupKey, R: &RistrettoPoint) -> Scalar {
+fn compute_challenge(message: &Uint8Array, group_key: &GroupKey, R: &RistrettoPoint) -> Scalar {
     let mut h2 = Sha512::new();
 
     // XXX [PAPER] Decide if we want a context string for the challenge.  This
@@ -333,7 +333,7 @@ impl SecretKey {
     /// a string describing the error which occurred.
     pub fn sign(
         &self,
-        message: &Buffer,
+        message: &Uint8Array,
         group_key: &GroupKey,
         // XXX [PAPER] I don't know that we can guarantee simultaneous runs of the protocol
         // with these nonces being potentially reused?
@@ -434,7 +434,7 @@ impl Aggregator for Initial {}
 //#[derive(Debug)]
 pub struct Finalized {
     /// The hashed context and message for signing.
-    pub(crate) message_buffer: Buffer,
+    pub(crate) message_buffer: Uint8Array,
 }
 
 impl Aggregator for Finalized {}
@@ -657,7 +657,7 @@ impl ThresholdSignature {
     /// A `Result` whose `Ok` value is an empty tuple if the threshold signature
     /// was successfully verified, otherwise a vector of the participant indices
     /// of any misbehaving participants.
-    pub fn verify(&self, group_key: &GroupKey, message: &Buffer) -> Result<(), ()> {
+    pub fn verify(&self, group_key: &GroupKey, message: &Uint8Array) -> Result<(), ()> {
         let c_prime = compute_challenge(&message, &group_key, &self.R);
         let R_prime = RistrettoPoint::vartime_double_scalar_mul_basepoint(&c_prime, &-group_key.0, &self.z);
 
